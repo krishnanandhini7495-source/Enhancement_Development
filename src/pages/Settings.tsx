@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { settingsAPI, type SalonSettings, type BranchDetails } from "@/services/settings";
+import { settingsAPI, type SalonSettings } from "@/services/settings";
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);

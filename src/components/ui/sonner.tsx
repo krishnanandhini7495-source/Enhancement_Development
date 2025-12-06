@@ -1,12 +1,12 @@
-import * as React from "react"
+// import * as React from "react"
 
-type ToastActionElement = React.ReactElement<any>
+// type ToastActionElement = React.ReactElement<any>
 
 export interface ToasterProps {
   position?: "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"
 }
 
-export const Toaster = ({ position = "bottom-right" }: ToasterProps) => {
+export const Toaster = () => {
   return null
 }
 

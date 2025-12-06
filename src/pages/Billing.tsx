@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Receipt, Printer } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
+// import { useAuth } from "@/contexts/AuthContext";
 import { generateAndPrintThermalBill } from "@/utils/thermalPrint";
 
 interface Service {
@@ -62,7 +62,7 @@ interface CustomerSuggestion {
 }
 
 const Billing = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
@@ -245,9 +245,9 @@ const Billing = () => {
     setProductLines(productLines.filter((line) => line.tempId !== tempId));
   };
 
-  const addPaymentMode = () => {
-    setPayments([...payments, { mode: "Cash", amount: 0 }]);
-  };
+  // const addPaymentMode = () => {
+  //   setPayments([...payments, { mode: "Cash", amount: 0 }]);
+  // };
 
   const updatePayment = (index: number, field: string, value: any) => {
     setPayments(
@@ -257,9 +257,9 @@ const Billing = () => {
     );
   };
 
-  const removePayment = (index: number) => {
-    setPayments(payments.filter((_, i) => i !== index));
-  };
+  // const removePayment = (index: number) => {
+  //   setPayments(payments.filter((_, i) => i !== index));
+  // };
 
   const calculateSubtotal = () => {
     const servicesTotal = serviceLines.reduce((sum, line) => sum + Number(line.finalPrice), 0);

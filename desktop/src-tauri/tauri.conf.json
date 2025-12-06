@@ -7,7 +7,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "CheapAndBest Salon",
+    "productName": "Salon",
     "version": "1.0.0"
   },
   "tauri": {
@@ -21,7 +21,7 @@
     "bundle": {
       "active": true,
       "category": "Business",
-      "copyright": "Copyright © 2025 Cheap&Best Salon",
+      "copyright": "Copyright © 2025 Salon Software",
       "deb": {
         "depends": []
       },

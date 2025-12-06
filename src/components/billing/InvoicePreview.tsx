@@ -45,69 +45,18 @@ export const InvoicePreview = ({ invoiceId, onClose }: InvoicePreviewProps) => {
 
   const fetchInvoiceData = async () => {
     try {
-      // Fetch invoice
-      const { data: invoiceData, error: invoiceError } = await supabase
-        .from("invoices")
-        .select("*")
-        .eq("id", invoiceId)
-        .single();
-
-      if (invoiceError) throw invoiceError;
-
-      // Fetch services with staff names
-      const { data: servicesData } = await supabase
-        .from("invoice_services")
-        .select(`
-          *,
-          services (name),
-          staff (name)
-        `)
-        .eq("invoice_id", invoiceId);
-
-      // Fetch products with names
-      const { data: productsData } = await supabase
-        .from("invoice_products")
-        .select(`
-          *,
-          products (name)
-        `)
-        .eq("invoice_id", invoiceId);
-
-      // Fetch payments
-      const { data: paymentsData } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("invoice_id", invoiceId);
-
-      // Fetch salon settings
-      const { data: salonData } = await supabase
-        .from("salon_settings")
-        .select("*")
-        .limit(1)
-        .single();
-
+      // TODO: Implement API calls for invoice data when invoices feature is added
       setInvoice({
-        invoice_number: invoiceData.invoice_number,
-        client_name: invoiceData.client_name,
-        client_phone: invoiceData.client_phone,
-        invoice_date: invoiceData.invoice_date,
-        total_amount: invoiceData.total_amount,
-        services: servicesData?.map((s: any) => ({
-          service_name: s.services.name,
-          base_price: s.base_price,
-          discount_percent: s.discount_percent,
-          final_price: s.final_price,
-          staff_name: s.staff?.name || null,
-        })) || [],
-        products: productsData?.map((p: any) => ({
-          product_name: p.products.name,
-          quantity: p.quantity,
-          unit_price: p.unit_price,
-          total_price: p.total_price,
-        })) || [],
-        payments: paymentsData || [],
-        salon_name: salonData?.salon_name || "Cheap&Best Salon",
-        branch_address: salonData?.branch_address || "123 Beauty Street",
+        invoice_number: "INV-000",
+        client_name: "Client Name",
+        client_phone: "0000000000",
+        invoice_date: new Date().toISOString(),
+        total_amount: 0,
+        services: [],
+        products: [],
+        payments: [],
+        salon_name: "Cheap&Best Salon",
+        branch_address: "123 Beauty Street",
       });
     } catch (error) {
       console.error("Error fetching invoice:", error);

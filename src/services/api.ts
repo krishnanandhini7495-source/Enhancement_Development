@@ -61,11 +61,11 @@ export const staffAPI = {
     const response = await apiClient.get(`/Staff/${id}`);
     return response.data;
   },
-  create: async (data: { name: string; phone?: string }) => {
+  create: async (data: { name: string; phone?: string; email?: string; address?: string; aadharNumber?: string }) => {
     const response = await apiClient.post('/Staff', data);
     return response.data;
   },
-  update: async (id: string, data: { name: string; phone?: string; active: boolean }) => {
+  update: async (id: string, data: { name: string; phone?: string; email?: string; address?: string; aadharNumber?: string; active: boolean }) => {
     const response = await apiClient.put(`/Staff/${id}`, data);
     return response.data;
   },
