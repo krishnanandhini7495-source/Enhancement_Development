@@ -1,0 +1,344 @@
+# ================================================
+# SALON SOFTWARE - COMPLETE INSTALLATION GUIDE
+# Version 1.0.0
+# ================================================
+
+## 📦 PACKAGE CONTENTS
+
+This deployment package contains everything you need to install Salon Software:
+
+```
+Salon_Deployment_Package/
+├── 1_Desktop_Installers/          # Desktop application installers
+│   ├── Salon_1.0.0_x64_en-US.msi  # MSI installer (5.42 MB)
+│   └── Salon_1.0.0_x64-setup.exe  # NSIS installer (3.56 MB)
+│
+├── 2_Backend_API/                 # Backend API server
+│   ├── SalonAPI/                  # Published API files
+│   ├── appsettings.json          # Configuration file
+│   ├── START_API.bat             # Manual startup script
+│   ├── INSTALL_SERVICE.bat       # Install as Windows service
+│   └── UNINSTALL_SERVICE.bat     # Uninstall service
+│
+├── 3_Database_Scripts/            # SQL Server database setup
+│   ├── 1_CreateDatabase.sql      # Create SalonDB database
+│   ├── 2_CreateTables.sql        # Create all tables
+│   ├── 3_SeedData.sql            # Insert default data
+│   └── SETUP_DATABASE.bat        # Automated setup script
+│
+└── 4_Documentation/               # Complete documentation
+    ├── README.md                  # Overview
+    ├── PREREQUISITES.md           # System requirements
+    └── DEPLOYMENT_GUIDE.md        # Deployment instructions
+```
+
+---
+
+## 🚀 QUICK START (5 STEPS)
+
+### STEP 1: Install Prerequisites (One-time setup)
+
+Download and install these on target PC (requires internet):
+
+1. **SQL Server 2022 Express** (Free, ~1.5 GB)
+   - Download: https://www.microsoft.com/sql-server/sql-server-downloads
+   - Choose: "Basic" installation
+   - Server name will be: `localhost\SQLEXPRESS`
+
+2. **.NET 9.0 Runtime** (Free, ~60 MB)
+   - Download: https://dotnet.microsoft.com/download/dotnet/9.0
+   - Install: "ASP.NET Core Runtime 9.0 - Windows Hosting Bundle"
+   - File: `dotnet-hosting-9.0.x-win.exe`
+
+**Verification:**
+```powershell
+# Check SQL Server
+sqlcmd -S localhost\SQLEXPRESS -Q "SELECT @@VERSION"
+
+# Check .NET Runtime
+dotnet --version
+# Should show: 9.0.x
+```
+
+---
+
+### STEP 2: Setup Database (Automatic)
+
+**Option A: Automated Setup (Recommended)**
+1. Open folder: `3_Database_Scripts`
+2. **Right-click** on `SETUP_DATABASE.bat`
+3. Click **"Run as administrator"**
+4. Enter SQL Server instance: `localhost\SQLEXPRESS` (or press Enter for default)
+5. Wait for completion (takes ~30 seconds)
+
+**What it does:**
+- Creates `SalonDB` database
+- Creates all tables (Users, Staff, Services, Products, Invoices, etc.)
+- Seeds default admin user and sample data
+
+**Default Credentials:**
+- Email: `admin@salon.com`
+- Password: `Admin@123`
+
+**Option B: Manual Setup (via SQL Server Management Studio)**
+1. Open SSMS
+2. Connect to `localhost\SQLEXPRESS`
+3. Open and execute scripts in order:
+   - `1_CreateDatabase.sql`
+   - `2_CreateTables.sql`
+   - `3_SeedData.sql`
+
+---
+
+### STEP 3: Configure Backend API
+
+1. Open folder: `2_Backend_API`
+2. Open `appsettings.json` in Notepad
+3. Verify connection string (should already be correct):
+   ```json
+   "ConnectionStrings": {
+     "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=SalonDB;Integrated Security=true;TrustServerCertificate=true;"
+   }
+   ```
+4. If your SQL Server instance name is different, update it
+
+**Connection String Examples:**
+- Default: `Server=localhost\\SQLEXPRESS;Database=SalonDB;Integrated Security=true;TrustServerCertificate=true;`
+- Named Instance: `Server=MYPC\\SQLEXPRESS;Database=SalonDB;Integrated Security=true;TrustServerCertificate=true;`
+- SQL Auth: `Server=localhost\\SQLEXPRESS;Database=SalonDB;User ID=sa;Password=YourPassword;TrustServerCertificate=true;`
+
+---
+
+### STEP 4: Start Backend API
+
+**Option A: Manual Startup (for testing)**
+1. Open folder: `2_Backend_API`
+2. Double-click: `START_API.bat`
+3. Window will open showing: "Now listening on: http://localhost:5000"
+4. Keep this window open while using the application
+
+**Option B: Install as Windows Service (recommended for production)**
+1. Open folder: `2_Backend_API`
+2. **Download NSSM** (if not included):
+   - URL: https://nssm.cc/download
+   - Extract `nssm.exe` to `2_Backend_API` folder
+3. **Right-click** on `INSTALL_SERVICE.bat`
+4. Click **"Run as administrator"**
+5. Service will be installed and started automatically
+6. API will start automatically with Windows
+
+**Verify API is running:**
+- Open browser
+- Go to: `http://localhost:5000`
+- Should see a response (may be empty, that's ok)
+
+---
+
+### STEP 5: Install Desktop Application
+
+**Option A: MSI Installer (Recommended)**
+1. Open folder: `1_Desktop_Installers`
+2. Double-click: `Salon_1.0.0_x64_en-US.msi`
+3. Follow installation wizard
+4. Click "Install"
+5. Launch from Start Menu: "Salon"
+
+**Option B: NSIS Installer**
+1. Open folder: `1_Desktop_Installers`
+2. Run: `Salon_1.0.0_x64-setup.exe`
+3. Follow installation steps
+4. Desktop shortcut will be created
+
+**First Login:**
+1. Launch Salon application
+2. Login with:
+   - Email: `admin@salon.com`
+   - Password: `Admin@123`
+3. Change password after first login (Settings → Profile)
+
+---
+
+## ✅ VERIFICATION CHECKLIST
+
+After installation, verify everything is working:
+
+- [ ] **SQL Server**: Can connect via SSMS to `localhost\SQLEXPRESS`
+- [ ] **Database**: SalonDB exists with tables (check SSMS Object Explorer)
+- [ ] **.NET Runtime**: `dotnet --version` shows 9.0.x
+- [ ] **Backend API**: `http://localhost:5000` is accessible
+- [ ] **Desktop App**: Installed and launches successfully
+- [ ] **Login**: Can login with admin@salon.com / Admin@123
+- [ ] **Dashboard**: Dashboard loads with data
+- [ ] **Features**: Can navigate to Staff, Services, Products, Billing
+
+---
+
+## 🔧 TROUBLESHOOTING
+
+### "Cannot connect to SQL Server"
+**Solution:**
+1. Check if SQL Server is running:
+   ```powershell
+   Get-Service | Where-Object {$_.Name -like "*SQL*"}
+   ```
+2. Start if stopped:
+   ```powershell
+   Start-Service MSSQL$SQLEXPRESS
+   ```
+3. Enable TCP/IP:
+   - Open "SQL Server Configuration Manager"
+   - SQL Server Network Configuration → Protocols for SQLEXPRESS
+   - Enable TCP/IP
+   - Restart SQL Server service
+
+### "Backend API not starting"
+**Check:**
+1. .NET Runtime installed: `dotnet --version`
+2. Port 5000 not in use:
+   ```powershell
+   Get-NetTCPConnection -LocalPort 5000
+   ```
+3. Database connection string correct in `appsettings.json`
+4. Check API log file in `2_Backend_API/logs/` folder
+
+### "Desktop app shows Network Error"
+**Solution:**
+1. Verify backend API is running (should see "listening on http://localhost:5000")
+2. Test API in browser: `http://localhost:5000`
+3. Check Windows Firewall isn't blocking localhost
+4. Restart desktop application
+
+### "Database setup failed"
+**Solution:**
+1. Check `setup_log.txt` in `3_Database_Scripts` folder
+2. Verify SQL Server instance name:
+   ```powershell
+   sqlcmd -L
+   ```
+3. Run scripts manually in SSMS
+4. Check SQL Server error logs
+
+---
+
+## 🌐 NETWORK DEPLOYMENT (Multiple PCs)
+
+### Server PC Setup:
+1. Follow Steps 1-4 above
+2. Note server PC IP address: `ipconfig`
+   - Example: `192.168.1.100`
+3. Configure Windows Firewall:
+   ```powershell
+   # Allow API port
+   New-NetFirewallRule -DisplayName "Salon API" -Direction Inbound -LocalPort 5000 -Protocol TCP -Action Allow
+   
+   # Allow SQL Server port
+   New-NetFirewallRule -DisplayName "SQL Server" -Direction Inbound -LocalPort 1433 -Protocol TCP -Action Allow
+   ```
+4. Enable SQL Server remote connections:
+   - SQL Server Configuration Manager
+   - SQL Server Network Configuration → TCP/IP → Enable
+   - Restart SQL Server
+
+### Client PC Setup:
+1. Install only Desktop Application (Step 5)
+2. Create config file: `%APPDATA%\Salon\config.json`
+   ```json
+   {
+     "ApiUrl": "http://192.168.1.100:5000"
+   }
+   ```
+3. Update SQL Server connection in server's `appsettings.json`:
+   ```json
+   "Server=192.168.1.100;Database=SalonDB;User ID=salon;Password=YourPassword;TrustServerCertificate=true;"
+   ```
+
+---
+
+## 📞 SUPPORT
+
+### Log Files:
+- API Logs: `2_Backend_API/logs/`
+- Database Setup Log: `3_Database_Scripts/setup_log.txt`
+- Windows Event Viewer: Application and System logs
+
+### Useful Commands:
+```powershell
+# Check services
+Get-Service | Where-Object {$_.Name -like "*Salon*"}
+
+# Check API port
+Get-NetTCPConnection -LocalPort 5000
+
+# Check SQL Server port
+Get-NetTCPConnection -LocalPort 1433
+
+# Restart backend service
+Restart-Service SalonAPI
+
+# Check .NET installation
+dotnet --list-runtimes
+```
+
+---
+
+## 🔄 UPDATES & MAINTENANCE
+
+### Update Desktop App:
+1. Uninstall old version from Control Panel
+2. Install new version from updated package
+
+### Update Backend API:
+1. Stop service: `net stop SalonAPI`
+2. Backup `2_Backend_API` folder
+3. Replace files with new version
+4. Update `appsettings.json` if needed
+5. Start service: `net start SalonAPI`
+
+### Backup Database:
+```powershell
+# Full backup
+sqlcmd -S localhost\SQLEXPRESS -Q "BACKUP DATABASE SalonDB TO DISK='C:\Backup\SalonDB_$(Get-Date -Format yyyyMMdd).bak'"
+```
+
+### Restore Database:
+```sql
+USE master;
+RESTORE DATABASE SalonDB FROM DISK='C:\Backup\SalonDB_20251206.bak' WITH REPLACE;
+```
+
+---
+
+## 📋 SYSTEM REQUIREMENTS SUMMARY
+
+| Component | Requirement |
+|-----------|-------------|
+| OS | Windows 10/11 (64-bit) |
+| RAM | 4 GB minimum |
+| Storage | 3 GB free space |
+| SQL Server | 2019 or later |
+| .NET Runtime | 9.0 or later |
+| Network | Optional (for multi-PC) |
+
+---
+
+## ✨ FEATURES CHECKLIST
+
+After successful installation, you'll have access to:
+
+- ✅ **Dashboard**: Overview of daily operations
+- ✅ **Staff Management**: Add/edit staff members with contact details
+- ✅ **Services Management**: Create service catalog with pricing
+- ✅ **Products Management**: Inventory tracking with stock levels
+- ✅ **Billing System**: Generate invoices with GST
+- ✅ **Reports**: Sales, revenue, and performance analytics
+- ✅ **Settings**: Salon details, branch info, GST configuration
+- ✅ **User Management**: Admin and staff roles with permissions
+- ✅ **Thermal Printing**: Receipt printing support
+- ✅ **Offline Mode**: Works without internet (if local setup)
+
+---
+
+**Installation Complete! 🎉**
+
+For detailed documentation, see the `4_Documentation` folder.
+For technical support, contact your system administrator.
