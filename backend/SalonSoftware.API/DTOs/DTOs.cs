@@ -30,6 +30,9 @@ public class StaffDto
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Address { get; set; }
+    public string? AadharNumber { get; set; }
     public bool Active { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -38,12 +41,18 @@ public class CreateStaffDto
 {
     public string Name { get; set; } = string.Empty;
     public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Address { get; set; }
+    public string? AadharNumber { get; set; }
 }
 
 public class UpdateStaffDto
 {
     public string Name { get; set; } = string.Empty;
     public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Address { get; set; }
+    public string? AadharNumber { get; set; }
     public bool Active { get; set; }
 }
 

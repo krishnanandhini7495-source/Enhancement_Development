@@ -2,9 +2,42 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { LayoutDashboard, Receipt, Briefcase, Package, Users, LogOut, Scissors, Settings, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { settingsAPI } from "@/services/settings";
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, userRole } = useAuth();
+  const [salonName, setSalonName] = useState("Cheap&Best Salon");
+
+  useEffect(() => {
+    const fetchSalonSettings = async () => {
+      try {
+        const settings = await settingsAPI.get();
+        if (settings?.salonName) {
+          setSalonName(settings.salonName);
+        }
+      } catch (error) {
+        console.error("Error fetching salon settings:", error);
+      }
+    };
+
+    fetchSalonSettings();
+
+    // Listen for settings changes
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchSalonSettings();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', fetchSalonSettings);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', fetchSalonSettings);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -14,7 +47,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="p-2 rounded-full bg-primary/10">
               <Scissors className="h-6 w-6 text-primary" />
             </div>
-            <h1 className="text-2xl font-display text-primary">Elegant Salon</h1>
+            <h1 className="text-2xl font-display text-primary">{salonName}</h1>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <NavLink to="/" className="text-sm font-medium hover:text-primary transition-smooth" activeClassName="text-primary">

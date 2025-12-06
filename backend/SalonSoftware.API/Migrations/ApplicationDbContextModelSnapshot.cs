@@ -502,12 +502,12 @@ namespace SalonSoftware.API.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             BranchAddresses = "[]",
-                            CreatedAt = new DateTime(2025, 11, 30, 11, 19, 9, 959, DateTimeKind.Utc).AddTicks(930),
+                            CreatedAt = new DateTime(2025, 12, 1, 15, 11, 5, 551, DateTimeKind.Utc).AddTicks(1766),
                             Email = "info@elegantsalon.com",
                             MainAddress = "123 Beauty Street, City, State - 400001",
                             Phone = "+91 98765 43210",
                             SalonName = "Elegant Salon",
-                            UpdatedAt = new DateTime(2025, 11, 30, 11, 19, 9, 959, DateTimeKind.Utc).AddTicks(931)
+                            UpdatedAt = new DateTime(2025, 12, 1, 15, 11, 5, 551, DateTimeKind.Utc).AddTicks(1766)
                         });
                 });
 
@@ -543,11 +543,23 @@ namespace SalonSoftware.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AadharNumber")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
+
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()

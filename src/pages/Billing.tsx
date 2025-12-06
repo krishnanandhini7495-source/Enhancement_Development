@@ -330,12 +330,12 @@ const Billing = () => {
 
       const invoice = await invoicesAPI.create(invoiceData);
 
-      toast.success("Invoice generated successfully!");
-      setGeneratedInvoiceId(invoice.id);
+      toast.success(`Invoice ${invoice.invoiceNumber} generated successfully!`);
+      setGeneratedInvoiceId(invoice.invoiceNumber);
       
       // Generate thermal bill data with salon settings
       const thermalBillData = {
-        salonName: salonSettings?.salonName || "Elegant Salon",
+        salonName: salonSettings?.salonName || "Cheap&Best Salon",
         salonAddress: selectedBranch || salonSettings?.mainAddress || "",
         salonPhone: salonSettings?.phone || "",
         salonEmail: salonSettings?.email || "",
@@ -409,7 +409,7 @@ const Billing = () => {
               <div className="flex items-center justify-center gap-2">
                 <Receipt className="h-16 w-16 text-green-600" />
               </div>
-              <p className="text-lg font-semibold">Invoice #{generatedInvoiceId}</p>
+              <p className="text-lg font-semibold">Invoice Number: {generatedInvoiceId}</p>
               {generatedInvoiceData && (
                 <>
                   <p className="text-muted-foreground">
@@ -486,13 +486,13 @@ const Billing = () => {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6">
         <Card className="shadow-soft overflow-visible">
           <CardHeader>
             <CardTitle>Client Information</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 overflow-visible">
-            <div className="space-y-2 relative">
+          <CardContent className="grid md:grid-cols-4 gap-4 overflow-visible">
+            <div className="space-y-2 relative md:col-span-1">
               <Label htmlFor="clientName">Customer Name *</Label>
               <Input
                 id="clientName"
@@ -510,7 +510,10 @@ const Billing = () => {
                   {customerSuggestions.map((customer, index) => (
                     <div
                       key={index}
-                      onClick={() => selectCustomer(customer)}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        selectCustomer(customer);
+                      }}
                       className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
                     >
                       <div className="font-medium text-gray-900">{customer.customerName}</div>
@@ -526,7 +529,7 @@ const Billing = () => {
                 </div>
               )}
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-1">
               <Label htmlFor="clientPhone">Phone Number *</Label>
               <Input
                 id="clientPhone"
@@ -540,18 +543,18 @@ const Billing = () => {
                 placeholder="+91 9876543210"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-1">
               <Label htmlFor="invoiceDate">Invoice Date</Label>
               <Input
                 id="invoiceDate"
                 type="date"
                 value={invoiceDate}
                 onChange={(e) => setInvoiceDate(e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
+                max={new Date().toISOString().split("T")[0]}
               />
             </div>
             {salonSettings && salonSettings.mainAddress && (
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-1">
                 <Label htmlFor="branch">Branch Location</Label>
                 <Select value={selectedBranch} onValueChange={setSelectedBranch}>
                   <SelectTrigger id="branch">
@@ -740,7 +743,7 @@ const Billing = () => {
           <CardTitle>Payment Type</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div className="grid grid-cols-4 md:grid-cols-8 gap-2 mb-4">
             {[
               { mode: "Cash", icon: "💵" },
               { mode: "GPay", icon: "📱" },
@@ -764,15 +767,15 @@ const Billing = () => {
                       setPayments([...payments, { mode: paymentOption.mode, amount: 0 }]);
                     }
                   }}
-                  className={`p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${
+                  className={`p-2 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${
                     isSelected 
                       ? 'border-primary bg-primary/10' 
                       : 'border-muted bg-muted/50 hover:border-primary/50'
                   }`}
                 >
                   <div className="text-center">
-                    <div className="text-2xl mb-1">{paymentOption.icon}</div>
-                    <div className="text-sm font-medium">{paymentOption.mode}</div>
+                    <div className="text-xl mb-0.5">{paymentOption.icon}</div>
+                    <div className="text-xs font-medium">{paymentOption.mode}</div>
                   </div>
                 </div>
               );

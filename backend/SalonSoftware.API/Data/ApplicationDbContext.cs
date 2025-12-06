@@ -125,7 +125,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             new SalonSettings
             {
                 Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                SalonName = "Elegant Salon",
+                SalonName = "Cheap&Best Salon",
                 MainAddress = "123 Beauty Street, City, State - 400001",
                 BranchAddresses = "[]",
                 Phone = "+91 98765 43210",

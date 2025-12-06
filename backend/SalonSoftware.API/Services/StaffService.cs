@@ -32,6 +32,9 @@ public class StaffService : IStaffService
                 Id = s.Id,
                 Name = s.Name,
                 Phone = s.Phone,
+                Email = s.Email,
+                Address = s.Address,
+                AadharNumber = s.AadharNumber,
                 Active = s.Active,
                 CreatedAt = s.CreatedAt
             })
@@ -48,6 +51,9 @@ public class StaffService : IStaffService
             Id = staff.Id,
             Name = staff.Name,
             Phone = staff.Phone,
+            Email = staff.Email,
+            Address = staff.Address,
+            AadharNumber = staff.AadharNumber,
             Active = staff.Active,
             CreatedAt = staff.CreatedAt
         };
@@ -58,7 +64,10 @@ public class StaffService : IStaffService
         var staff = new Staff
         {
             Name = dto.Name,
-            Phone = dto.Phone
+            Phone = dto.Phone,
+            Email = dto.Email,
+            Address = dto.Address,
+            AadharNumber = dto.AadharNumber
         };
 
         _context.Staff.Add(staff);
@@ -69,6 +78,9 @@ public class StaffService : IStaffService
             Id = staff.Id,
             Name = staff.Name,
             Phone = staff.Phone,
+            Email = staff.Email,
+            Address = staff.Address,
+            AadharNumber = staff.AadharNumber,
             Active = staff.Active,
             CreatedAt = staff.CreatedAt
         };
@@ -81,6 +93,9 @@ public class StaffService : IStaffService
 
         staff.Name = dto.Name;
         staff.Phone = dto.Phone;
+        staff.Email = dto.Email;
+        staff.Address = dto.Address;
+        staff.AadharNumber = dto.AadharNumber;
         staff.Active = dto.Active;
 
         await _context.SaveChangesAsync();
@@ -90,6 +105,9 @@ public class StaffService : IStaffService
             Id = staff.Id,
             Name = staff.Name,
             Phone = staff.Phone,
+            Email = staff.Email,
+            Address = staff.Address,
+            AadharNumber = staff.AadharNumber,
             Active = staff.Active,
             CreatedAt = staff.CreatedAt
         };

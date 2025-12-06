@@ -17,7 +17,7 @@ public class SalonSettings
     
     [Required]
     [MaxLength(200)]
-    public string SalonName { get; set; } = "Elegant Salon";
+    public string SalonName { get; set; } = "Cheap&Best Salon";
     
     [Required]
     [MaxLength(500)]

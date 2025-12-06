@@ -14,6 +14,15 @@ public class Staff
     [MaxLength(20)]
     public string? Phone { get; set; }
     
+    [MaxLength(200)]
+    public string? Email { get; set; }
+    
+    [MaxLength(500)]
+    public string? Address { get; set; }
+    
+    [MaxLength(12)]
+    public string? AadharNumber { get; set; }
+    
     public bool Active { get; set; } = true;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

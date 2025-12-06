@@ -33,7 +33,7 @@ public class SettingsController : ControllerBase
                 // Create default settings if none exist
                 settings = new SalonSettings
                 {
-                    SalonName = "Elegant Salon",
+                    SalonName = "Cheap&Best Salon",
                     MainAddress = "123 Beauty Street, City, State - 400001",
                     BranchAddresses = "[]",
                     Phone = "+91 98765 43210",

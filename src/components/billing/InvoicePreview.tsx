@@ -106,7 +106,7 @@ export const InvoicePreview = ({ invoiceId, onClose }: InvoicePreviewProps) => {
           total_price: p.total_price,
         })) || [],
         payments: paymentsData || [],
-        salon_name: salonData?.salon_name || "Elegant Salon",
+        salon_name: salonData?.salon_name || "Cheap&Best Salon",
         branch_address: salonData?.branch_address || "123 Beauty Street",
       });
     } catch (error) {

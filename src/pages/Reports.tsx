@@ -133,6 +133,13 @@ const Reports = () => {
     return filteredInvoices.reduce((sum, invoice) => sum + invoice.totalAmount, 0);
   };
 
+  const getTotalGST = () => {
+    return filteredInvoices.reduce((sum, invoice) => {
+      const gst = invoice.subtotal * 0.05; // CGST 2.5% + SGST 2.5% = 5%
+      return sum + gst;
+    }, 0);
+  };
+
   const getTotalReceived = () => {
     return filteredInvoices.reduce((sum, invoice) => {
       const received = invoice.payments.reduce((pSum, p) => pSum + p.amount, 0);
@@ -180,7 +187,7 @@ const Reports = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-6 md:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-5">
         <Card className="shadow-soft">
           <CardContent className="pt-6">
             <div className="space-y-2">
@@ -194,6 +201,14 @@ const Reports = () => {
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Total Revenue</p>
               <p className="text-2xl font-bold text-primary">{formatCurrency(getTotalRevenue())}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="shadow-soft">
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Total GST</p>
+              <p className="text-2xl font-bold text-blue-600">{formatCurrency(getTotalGST())}</p>
             </div>
           </CardContent>
         </Card>
@@ -293,6 +308,9 @@ const Reports = () => {
                     <TableHead>Date</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>Phone</TableHead>
+                    <TableHead className="text-right">Subtotal</TableHead>
+                    <TableHead className="text-right">CGST (2.5%)</TableHead>
+                    <TableHead className="text-right">SGST (2.5%)</TableHead>
                     <TableHead className="text-right">Total Amount</TableHead>
                     <TableHead className="text-right">Received</TableHead>
                     <TableHead className="text-right">Balance</TableHead>
@@ -303,6 +321,8 @@ const Reports = () => {
                   {filteredInvoices.map((invoice) => {
                     const amountReceived = invoice.payments.reduce((sum, p) => sum + p.amount, 0);
                     const balanceAmount = amountReceived - invoice.totalAmount;
+                    const cgst = invoice.subtotal * 0.025;
+                    const sgst = invoice.subtotal * 0.025;
                     
                     return (
                       <TableRow key={invoice.id}>
@@ -310,7 +330,10 @@ const Reports = () => {
                         <TableCell>{formatDate(invoice.invoiceDate)}</TableCell>
                         <TableCell>{invoice.clientName}</TableCell>
                         <TableCell>{invoice.clientPhone}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(invoice.totalAmount)}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(invoice.subtotal)}</TableCell>
+                        <TableCell className="text-right text-blue-600">{formatCurrency(cgst)}</TableCell>
+                        <TableCell className="text-right text-blue-600">{formatCurrency(sgst)}</TableCell>
+                        <TableCell className="text-right font-semibold">{formatCurrency(invoice.totalAmount)}</TableCell>
                         <TableCell className="text-right text-green-600">
                           {formatCurrency(amountReceived)}
                         </TableCell>
@@ -439,7 +462,19 @@ const Reports = () => {
                     </div>
                   )}
                   <div className="border-t pt-2 mt-2">
-                    <div className="flex justify-between font-semibold">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Subtotal:</span>
+                      <span>{formatCurrency(selectedInvoice.subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-blue-600">
+                      <span>CGST (2.5%):</span>
+                      <span>{formatCurrency(selectedInvoice.subtotal * 0.025)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-blue-600">
+                      <span>SGST (2.5%):</span>
+                      <span>{formatCurrency(selectedInvoice.subtotal * 0.025)}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold border-t pt-2 mt-2">
                       <span>Total Amount:</span>
                       <span>{formatCurrency(selectedInvoice.totalAmount)}</span>
                     </div>

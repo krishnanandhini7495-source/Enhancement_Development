@@ -14,6 +14,9 @@ interface StaffMember {
   id: string;
   name: string;
   phone: string | null;
+  email: string | null;
+  address: string | null;
+  aadharNumber: string | null;
   active: boolean;
 }
 
@@ -22,7 +25,7 @@ const Staff = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
-  const [formData, setFormData] = useState({ name: "", phone: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "", email: "", address: "", aadharNumber: "" });
 
   useEffect(() => {
     fetchStaff();
@@ -53,6 +56,9 @@ const Staff = () => {
         await staffAPI.update(editingStaff.id, {
           name: formData.name,
           phone: formData.phone || undefined,
+          email: formData.email || undefined,
+          address: formData.address || undefined,
+          aadharNumber: formData.aadharNumber || undefined,
           active: editingStaff.active
         });
         toast.success("Staff member updated successfully");
@@ -60,12 +66,15 @@ const Staff = () => {
         await staffAPI.create({
           name: formData.name,
           phone: formData.phone || undefined,
+          email: formData.email || undefined,
+          address: formData.address || undefined,
+          aadharNumber: formData.aadharNumber || undefined,
         });
         toast.success("Staff member added successfully");
       }
 
       setDialogOpen(false);
-      setFormData({ name: "", phone: "" });
+      setFormData({ name: "", phone: "", email: "", address: "", aadharNumber: "" });
       setEditingStaff(null);
       fetchStaff();
     } catch (error: any) {
@@ -79,6 +88,9 @@ const Staff = () => {
     setFormData({
       name: staffMember.name,
       phone: staffMember.phone || "",
+      email: staffMember.email || "",
+      address: staffMember.address || "",
+      aadharNumber: staffMember.aadharNumber || "",
     });
     setDialogOpen(true);
   };
@@ -88,6 +100,9 @@ const Staff = () => {
       await staffAPI.update(staffMember.id, {
         name: staffMember.name,
         phone: staffMember.phone || undefined,
+        email: staffMember.email || undefined,
+        address: staffMember.address || undefined,
+        aadharNumber: staffMember.aadharNumber || undefined,
         active: !staffMember.active
       });
       toast.success(`Staff member ${!staffMember.active ? "activated" : "deactivated"}`);
@@ -131,7 +146,7 @@ const Staff = () => {
             <Button
               onClick={() => {
                 setEditingStaff(null);
-                setFormData({ name: "", phone: "" });
+                setFormData({ name: "", phone: "", email: "", address: "", aadharNumber: "" });
               }}
               className="gradient-primary hover:opacity-90 transition-smooth"
             >
@@ -166,6 +181,35 @@ const Staff = () => {
                   placeholder="+91 9876543210"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="john@example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="123 Main Street, City"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="aadharNumber">Aadhar Number</Label>
+                <Input
+                  id="aadharNumber"
+                  value={formData.aadharNumber}
+                  onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
+                  placeholder="1234 5678 9012"
+                  maxLength={12}
+                />
+              </div>
               <Button type="submit" className="w-full">
                 {editingStaff ? "Update" : "Add"} Staff Member
               </Button>
@@ -184,6 +228,9 @@ const Staff = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Phone</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>Aadhar Number</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -193,6 +240,9 @@ const Staff = () => {
                 <TableRow key={member.id}>
                   <TableCell className="font-medium">{member.name}</TableCell>
                   <TableCell>{member.phone || "-"}</TableCell>
+                  <TableCell>{member.email || "-"}</TableCell>
+                  <TableCell>{member.address || "-"}</TableCell>
+                  <TableCell>{member.aadharNumber || "-"}</TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <Switch

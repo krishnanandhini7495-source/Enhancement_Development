@@ -75,7 +75,7 @@ const Auth = () => {
               <Scissors className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-display">Elegant Salon</CardTitle>
+          <CardTitle className="text-3xl font-display">Cheap&Best Salon</CardTitle>
           <CardDescription>
             {isLogin ? "Sign in to your account" : "Create a new account"}
           </CardDescription>
