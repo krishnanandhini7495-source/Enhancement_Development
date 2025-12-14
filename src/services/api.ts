@@ -61,11 +61,36 @@ export const staffAPI = {
     const response = await apiClient.get(`/Staff/${id}`);
     return response.data;
   },
-  create: async (data: { name: string; phone?: string; email?: string; address?: string; aadharNumber?: string }) => {
+  create: async (data: { 
+    name: string; 
+    phone?: string; 
+    email?: string; 
+    address?: string; 
+    aadharNumber?: string;
+    staffCategory?: string;
+    bankName?: string;
+    bankAccountNumber?: string;
+    ifscCode?: string;
+    basicSalary?: number;
+    salaryEffectiveDate?: string;
+  }) => {
     const response = await apiClient.post('/Staff', data);
     return response.data;
   },
-  update: async (id: string, data: { name: string; phone?: string; email?: string; address?: string; aadharNumber?: string; active: boolean }) => {
+  update: async (id: string, data: { 
+    name: string; 
+    phone?: string; 
+    email?: string; 
+    address?: string; 
+    aadharNumber?: string;
+    staffCategory?: string;
+    bankName?: string;
+    bankAccountNumber?: string;
+    ifscCode?: string;
+    basicSalary?: number;
+    salaryEffectiveDate?: string;
+    active: boolean;
+  }) => {
     const response = await apiClient.put(`/Staff/${id}`, data);
     return response.data;
   },
@@ -107,16 +132,62 @@ export const productsAPI = {
     const response = await apiClient.get(`/Products/${id}`);
     return response.data;
   },
-  create: async (data: { name: string; price: number; stockQuantity: number }) => {
+  create: async (data: { 
+    name: string; 
+    price: number; 
+    stockQuantity: number;
+    openingStockQuantity?: number;
+    openingStockDate?: string;
+    currentStockQuantity?: number;
+    currentStockDate?: string;
+    productWeightUnit?: string;
+    productWeight?: number;
+  }) => {
     const response = await apiClient.post('/Products', data);
     return response.data;
   },
-  update: async (id: string, data: { name: string; price: number; stockQuantity: number; active: boolean }) => {
+  update: async (id: string, data: { 
+    name: string; 
+    price: number; 
+    stockQuantity: number; 
+    active: boolean;
+    openingStockQuantity?: number;
+    openingStockDate?: string;
+    currentStockQuantity?: number;
+    currentStockDate?: string;
+    productWeightUnit?: string;
+    productWeight?: number;
+  }) => {
     const response = await apiClient.put(`/Products/${id}`, data);
     return response.data;
   },
   delete: async (id: string) => {
     await apiClient.delete(`/Products/${id}`);
+  },
+  getLowStock: async () => {
+    const response = await apiClient.get('/Products/low-stock');
+    return response.data;
+  },
+  exportToCsv: async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/Products/export/csv`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) throw new Error('Export failed');
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `products_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   },
 };
 

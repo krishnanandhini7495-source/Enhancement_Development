@@ -12,6 +12,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<Staff> Staff { get; set; }
+    public DbSet<StaffSalaryHistory> StaffSalaryHistory { get; set; }
     public DbSet<Service> Services { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Customer> Customers { get; set; }

@@ -436,14 +436,33 @@ namespace SalonSoftware.API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("CurrentStockDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CurrentStockQuantity")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime?>("OpeningStockDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("OpeningStockQuantity")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ProductWeight")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ProductWeightUnit")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("StockQuantity")
                         .HasColumnType("int");
@@ -502,12 +521,12 @@ namespace SalonSoftware.API.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             BranchAddresses = "[]",
-                            CreatedAt = new DateTime(2025, 12, 1, 15, 11, 5, 551, DateTimeKind.Utc).AddTicks(1766),
+                            CreatedAt = new DateTime(2025, 12, 6, 14, 55, 5, 622, DateTimeKind.Utc).AddTicks(9398),
                             Email = "info@elegantsalon.com",
                             MainAddress = "123 Beauty Street, City, State - 400001",
                             Phone = "+91 98765 43210",
-                            SalonName = "Elegant Salon",
-                            UpdatedAt = new DateTime(2025, 12, 1, 15, 11, 5, 551, DateTimeKind.Utc).AddTicks(1766)
+                            SalonName = "Cheap&Best Salon",
+                            UpdatedAt = new DateTime(2025, 12, 6, 14, 55, 5, 622, DateTimeKind.Utc).AddTicks(9399)
                         });
                 });
 
@@ -554,12 +573,24 @@ namespace SalonSoftware.API.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("BankAccountNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("BankName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("IfscCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -570,9 +601,41 @@ namespace SalonSoftware.API.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("StaffCategory")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Staff");
+                });
+
+            modelBuilder.Entity("SalonSoftware.API.Models.StaffSalaryHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EffectiveFromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveToDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("StaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("StaffSalaryHistory");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -692,6 +755,17 @@ namespace SalonSoftware.API.Migrations
                     b.Navigation("Invoice");
                 });
 
+            modelBuilder.Entity("SalonSoftware.API.Models.StaffSalaryHistory", b =>
+                {
+                    b.HasOne("SalonSoftware.API.Models.Staff", "Staff")
+                        .WithMany("SalaryHistory")
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Staff");
+                });
+
             modelBuilder.Entity("SalonSoftware.API.Models.Customer", b =>
                 {
                     b.Navigation("Invoices");
@@ -719,6 +793,8 @@ namespace SalonSoftware.API.Migrations
             modelBuilder.Entity("SalonSoftware.API.Models.Staff", b =>
                 {
                     b.Navigation("InvoiceServices");
+
+                    b.Navigation("SalaryHistory");
                 });
 #pragma warning restore 612, 618
         }

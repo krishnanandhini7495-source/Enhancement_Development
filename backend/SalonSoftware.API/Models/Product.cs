@@ -18,6 +18,20 @@ public class Product
     
     public int StockQuantity { get; set; } = 0;
     
+    // Stock management fields
+    public int? OpeningStockQuantity { get; set; }
+    
+    public DateTime? OpeningStockDate { get; set; }
+    
+    public int? CurrentStockQuantity { get; set; }
+    
+    public DateTime? CurrentStockDate { get; set; }
+    
+    [MaxLength(20)]
+    public string? ProductWeightUnit { get; set; } // "gm", "ml", "count"
+    
+    public decimal? ProductWeight { get; set; }
+    
     public bool Active { get; set; } = true;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

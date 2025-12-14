@@ -63,4 +63,36 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("low-stock")]
+    public async Task<IActionResult> GetLowStock()
+    {
+        var products = await _productService.GetLowStockProductsAsync();
+        return Ok(products);
+    }
+
+    [HttpGet("export/csv")]
+    public async Task<IActionResult> ExportToCsv()
+    {
+        var products = await _productService.GetAllAsync();
+        
+        var csv = new System.Text.StringBuilder();
+        csv.AppendLine("Name,Price,Stock Quantity,Opening Stock Quantity,Opening Stock Date,Current Stock Quantity,Current Stock Date,Product Weight,Weight Unit,Status,Created Date");
+        
+        foreach (var product in products)
+        {
+            csv.AppendLine($"\"{product.Name}\",{product.Price},{product.StockQuantity}," +
+                $"{product.OpeningStockQuantity?.ToString() ?? ""}," +
+                $"{product.OpeningStockDate?.ToString("yyyy-MM-dd") ?? ""}," +
+                $"{product.CurrentStockQuantity?.ToString() ?? ""}," +
+                $"{product.CurrentStockDate?.ToString("yyyy-MM-dd") ?? ""}," +
+                $"{product.ProductWeight?.ToString() ?? ""}," +
+                $"\"{product.ProductWeightUnit ?? ""}\"," +
+                $"{(product.Active ? "Active" : "Inactive")}," +
+                $"{product.CreatedAt:yyyy-MM-dd}");
+        }
+        
+        var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+        return File(bytes, "text/csv", $"products_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+    }
 }

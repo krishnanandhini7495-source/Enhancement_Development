@@ -63,4 +63,33 @@ public class StaffController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("export/csv")]
+    public async Task<IActionResult> ExportToCsv()
+    {
+        var staff = await _staffService.GetAllAsync();
+        
+        var csv = new System.Text.StringBuilder();
+        csv.AppendLine("Name,Phone,Email,Address,Aadhar Number,Staff Category,Current Salary,Salary Effective Date,Bank Name,Account Number,IFSC Code,Status,Created Date");
+        
+        foreach (var s in staff)
+        {
+            csv.AppendLine($"\"{s.Name}\"," +
+                $"\"{s.Phone ?? ""}\"," +
+                $"\"{s.Email ?? ""}\"," +
+                $"\"{s.Address ?? ""}\"," +
+                $"\"{s.AadharNumber ?? ""}\"," +
+                $"\"{s.StaffCategory ?? ""}\"," +
+                $"{(s.CurrentSalary != null ? s.CurrentSalary.BasicSalary.ToString() : "")}," +
+                $"{(s.CurrentSalary != null ? s.CurrentSalary.EffectiveFromDate.ToString("yyyy-MM-dd") : "")}," +
+                $"\"{s.BankName ?? ""}\"," +
+                $"\"{s.BankAccountNumber ?? ""}\"," +
+                $"\"{s.IfscCode ?? ""}\"," +
+                $"{(s.Active ? "Active" : "Inactive")}," +
+                $"{s.CreatedAt:yyyy-MM-dd}");
+        }
+        
+        var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+        return File(bytes, "text/csv", $"staff_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+    }
 }

@@ -33,8 +33,13 @@ public class StaffDto
     public string? Email { get; set; }
     public string? Address { get; set; }
     public string? AadharNumber { get; set; }
+    public string? StaffCategory { get; set; }
+    public string? BankName { get; set; }
+    public string? BankAccountNumber { get; set; }
+    public string? IfscCode { get; set; }
     public bool Active { get; set; }
     public DateTime CreatedAt { get; set; }
+    public StaffSalaryHistoryDto? CurrentSalary { get; set; }
 }
 
 public class CreateStaffDto
@@ -44,6 +49,12 @@ public class CreateStaffDto
     public string? Email { get; set; }
     public string? Address { get; set; }
     public string? AadharNumber { get; set; }
+    public string? StaffCategory { get; set; }
+    public string? BankName { get; set; }
+    public string? BankAccountNumber { get; set; }
+    public string? IfscCode { get; set; }
+    public decimal? BasicSalary { get; set; }
+    public DateTime? SalaryEffectiveDate { get; set; }
 }
 
 public class UpdateStaffDto
@@ -53,7 +64,23 @@ public class UpdateStaffDto
     public string? Email { get; set; }
     public string? Address { get; set; }
     public string? AadharNumber { get; set; }
+    public string? StaffCategory { get; set; }
+    public string? BankName { get; set; }
+    public string? BankAccountNumber { get; set; }
+    public string? IfscCode { get; set; }
     public bool Active { get; set; }
+    public decimal? BasicSalary { get; set; }
+    public DateTime? SalaryEffectiveDate { get; set; }
+}
+
+public class StaffSalaryHistoryDto
+{
+    public Guid Id { get; set; }
+    public Guid StaffId { get; set; }
+    public decimal BasicSalary { get; set; }
+    public DateTime EffectiveFromDate { get; set; }
+    public DateTime? EffectiveToDate { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 // Service DTOs
@@ -86,6 +113,12 @@ public class ProductDto
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
+    public int? OpeningStockQuantity { get; set; }
+    public DateTime? OpeningStockDate { get; set; }
+    public int? CurrentStockQuantity { get; set; }
+    public DateTime? CurrentStockDate { get; set; }
+    public string? ProductWeightUnit { get; set; }
+    public decimal? ProductWeight { get; set; }
     public bool Active { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -95,6 +128,12 @@ public class CreateProductDto
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
+    public int? OpeningStockQuantity { get; set; }
+    public DateTime? OpeningStockDate { get; set; }
+    public int? CurrentStockQuantity { get; set; }
+    public DateTime? CurrentStockDate { get; set; }
+    public string? ProductWeightUnit { get; set; }
+    public decimal? ProductWeight { get; set; }
 }
 
 public class UpdateProductDto
@@ -102,6 +141,12 @@ public class UpdateProductDto
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
+    public int? OpeningStockQuantity { get; set; }
+    public DateTime? OpeningStockDate { get; set; }
+    public int? CurrentStockQuantity { get; set; }
+    public DateTime? CurrentStockDate { get; set; }
+    public string? ProductWeightUnit { get; set; }
+    public decimal? ProductWeight { get; set; }
     public bool Active { get; set; }
 }
 
@@ -192,6 +237,7 @@ public class DashboardStatsDto
     public int TotalServices { get; set; }
     public int TotalProducts { get; set; }
     public int TotalStaff { get; set; }
+    public List<ProductDto> LowStockProducts { get; set; } = new();
 }
 
 // Settings DTOs

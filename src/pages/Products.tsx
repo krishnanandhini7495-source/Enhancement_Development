@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Edit, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 
@@ -15,6 +16,12 @@ interface Product {
   name: string;
   price: number;
   stockQuantity: number;
+  openingStockQuantity?: number;
+  openingStockDate?: string;
+  currentStockQuantity?: number;
+  currentStockDate?: string;
+  productWeightUnit?: string;
+  productWeight?: number;
   active: boolean;
 }
 
@@ -23,7 +30,17 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState({ name: "", price: "", stock_quantity: "" });
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    price: "", 
+    stock_quantity: "",
+    opening_stock_quantity: "",
+    opening_stock_date: "",
+    current_stock_quantity: "",
+    current_stock_date: "",
+    product_weight_unit: "count",
+    product_weight: ""
+  });
 
   useEffect(() => {
     fetchProducts();
@@ -41,34 +58,60 @@ const Products = () => {
     }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      await productsAPI.exportToCsv();
+      toast.success("Products exported successfully");
+    } catch (error) {
+      console.error("Error exporting products:", error);
+      toast.error("Failed to export products");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim() || !formData.price || !formData.stock_quantity) {
-      toast.error("Please fill in all fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
     try {
+      const productData = {
+        name: formData.name,
+        price: parseFloat(formData.price),
+        stockQuantity: parseInt(formData.stock_quantity),
+        openingStockQuantity: formData.opening_stock_quantity ? parseInt(formData.opening_stock_quantity) : undefined,
+        openingStockDate: formData.opening_stock_date || undefined,
+        currentStockQuantity: formData.current_stock_quantity ? parseInt(formData.current_stock_quantity) : undefined,
+        currentStockDate: formData.current_stock_date || undefined,
+        productWeightUnit: formData.product_weight_unit || undefined,
+        productWeight: formData.product_weight ? parseFloat(formData.product_weight) : undefined,
+      };
+
       if (editingProduct) {
         await productsAPI.update(editingProduct.id, {
-          name: formData.name,
-          price: parseFloat(formData.price),
-          stockQuantity: parseInt(formData.stock_quantity),
+          ...productData,
           active: editingProduct.active
         });
         toast.success("Product updated successfully");
       } else {
-        await productsAPI.create({
-          name: formData.name,
-          price: parseFloat(formData.price),
-          stockQuantity: parseInt(formData.stock_quantity),
-        });
+        await productsAPI.create(productData);
         toast.success("Product added successfully");
       }
 
       setDialogOpen(false);
-      setFormData({ name: "", price: "", stock_quantity: "" });
+      setFormData({ 
+        name: "", 
+        price: "", 
+        stock_quantity: "",
+        opening_stock_quantity: "",
+        opening_stock_date: "",
+        current_stock_quantity: "",
+        current_stock_date: "",
+        product_weight_unit: "count",
+        product_weight: ""
+      });
       setEditingProduct(null);
       fetchProducts();
     } catch (error: any) {
@@ -83,6 +126,12 @@ const Products = () => {
       name: product.name,
       price: product.price.toString(),
       stock_quantity: product.stockQuantity.toString(),
+      opening_stock_quantity: product.openingStockQuantity?.toString() || "",
+      opening_stock_date: product.openingStockDate?.split('T')[0] || "",
+      current_stock_quantity: product.currentStockQuantity?.toString() || "",
+      current_stock_date: product.currentStockDate?.split('T')[0] || "",
+      product_weight_unit: product.productWeightUnit || "count",
+      product_weight: product.productWeight?.toString() || "",
     });
     setDialogOpen(true);
   };
@@ -93,6 +142,12 @@ const Products = () => {
         name: product.name,
         price: product.price,
         stockQuantity: product.stockQuantity,
+        openingStockQuantity: product.openingStockQuantity,
+        openingStockDate: product.openingStockDate,
+        currentStockQuantity: product.currentStockQuantity,
+        currentStockDate: product.currentStockDate,
+        productWeightUnit: product.productWeightUnit,
+        productWeight: product.productWeight,
         active: !product.active
       });
       toast.success(`Product ${!product.active ? "activated" : "deactivated"}`);
@@ -129,67 +184,139 @@ const Products = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-display mb-2">Products</h1>
-          <p className="text-muted-foreground">Manage your salon products</p>
+          <p className="text-muted-foreground">Manage your salon products and inventory</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              onClick={() => {
-                setEditingProduct(null);
-                setFormData({ name: "", price: "", stock_quantity: "" });
-              }}
-              className="gradient-primary hover:opacity-90 transition-smooth"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Product
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingProduct ? "Edit Product" : "Add New Product"}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Product Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Hair Oil"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (₹) *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="299"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="stock">Stock Quantity *</Label>
-                <Input
-                  id="stock"
-                  type="number"
-                  value={formData.stock_quantity}
-                  onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
-                  placeholder="50"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                {editingProduct ? "Update" : "Add"} Product
+        <div className="flex gap-2">
+          <Button
+            onClick={handleExportCSV}
+            variant="outline"
+            className="border-primary text-primary hover:bg-primary hover:text-white transition-smooth"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {
+                  setEditingProduct(null);
+                  setFormData({ 
+                    name: "", 
+                    price: "", 
+                    stock_quantity: "",
+                    opening_stock_quantity: "",
+                    opening_stock_date: "",
+                    current_stock_quantity: "",
+                    current_stock_date: "",
+                    product_weight_unit: "count",
+                    product_weight: ""
+                  });
+                }}
+                className="gradient-primary hover:opacity-90 transition-smooth"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingProduct ? "Edit Product" : "Add New Product"}
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2 col-span-2">
+                    <Label htmlFor="name">Product Name *</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Hair Oil"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="price">Price (₹) *</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      placeholder="299"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="text-sm font-medium mb-3">Stock Management</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="opening_stock_quantity">Opening Stock Quantity</Label>
+                      <Input
+                        id="opening_stock_quantity"
+                        type="number"
+                        value={formData.opening_stock_quantity}
+                        onChange={(e) => setFormData({ ...formData, opening_stock_quantity: e.target.value })}
+                        placeholder="100"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="opening_stock_date">Opening Stock Date</Label>
+                      <Input
+                        id="opening_stock_date"
+                        type="date"
+                        value={formData.opening_stock_date}
+                        onChange={(e) => setFormData({ ...formData, opening_stock_date: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="current_stock_quantity">Current Stock Quantity</Label>
+                      <Input
+                        id="current_stock_quantity"
+                        type="number"
+                        value={formData.current_stock_quantity}
+                        onChange={(e) => setFormData({ ...formData, current_stock_quantity: e.target.value })}
+                        placeholder="75"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="current_stock_date">Current Stock Date</Label>
+                      <Input
+                        id="current_stock_date"
+                        type="date"
+                        value={formData.current_stock_date}
+                        onChange={(e) => setFormData({ ...formData, current_stock_date: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="product_weight_unit">Unit</Label>
+                      <Select 
+                        value={formData.product_weight_unit} 
+                        onValueChange={(value) => setFormData({ ...formData, product_weight_unit: value })}
+                      >
+                        <SelectTrigger id="product_weight_unit">
+                          <SelectValue placeholder="Select unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="gm">Grams (gm)</SelectItem>
+                          <SelectItem value="ml">Milliliters (ml)</SelectItem>
+                          <SelectItem value="count">Count/Pieces</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full">
+                  {editingProduct ? "Update" : "Add"} Product
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card className="shadow-soft">
@@ -197,55 +324,75 @@ const Products = () => {
           <CardTitle>All Products</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="text-right">Stock</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell className="text-right">₹{Number(product.price).toFixed(2)}</TableCell>
-                  <TableCell className="text-right">{product.stockQuantity}</TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <Switch
-                        checked={product.active}
-                        onCheckedChange={() => handleToggleActive(product)}
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {product.active ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="text-right">Opening Stock</TableHead>
+                  <TableHead className="text-right">Current Stock</TableHead>
+                  <TableHead>Unit</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {products.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="text-right">₹{Number(product.price).toFixed(2)}</TableCell>
+                    <TableCell className="text-right">
+                      {product.openingStockQuantity !== null && product.openingStockQuantity !== undefined ? product.openingStockQuantity : '-'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.currentStockQuantity !== null && product.currentStockQuantity !== undefined ? (
+                        <span className={
+                          (product.productWeightUnit === 'gm' && product.currentStockQuantity < 50) ||
+                          (product.productWeightUnit === 'ml' && product.currentStockQuantity < 50) ||
+                          (product.productWeightUnit === 'count' && product.currentStockQuantity < 5)
+                            ? 'text-red-600 font-semibold'
+                            : ''
+                        }>
+                          {product.currentStockQuantity}
+                        </span>
+                      ) : '-'}
+                    </TableCell>
+                    <TableCell>{product.productWeightUnit || '-'}</TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Switch
+                          checked={product.active}
+                          onCheckedChange={() => handleToggleActive(product)}
+                        />
+                        <span className="text-sm text-muted-foreground">
+                          {product.active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(product)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(product.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
           {products.length === 0 && (
             <p className="text-center text-muted-foreground py-8">No products found</p>
           )}

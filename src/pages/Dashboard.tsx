@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import { dashboardAPI } from "@/services/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, FileText, Package, Users, TrendingUp } from "lucide-react";
+import { DollarSign, FileText, Package, Users, TrendingUp, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+interface Product {
+  id: string;
+  name: string;
+  currentStockQuantity?: number;
+  productWeightUnit?: string;
+}
 
 interface DashboardStats {
   todaySales: number;
@@ -10,6 +18,7 @@ interface DashboardStats {
   totalServices: number;
   totalProducts: number;
   totalStaff: number;
+  lowStockProducts: Product[];
 }
 
 const Dashboard = () => {
@@ -20,6 +29,7 @@ const Dashboard = () => {
     totalServices: 0,
     totalProducts: 0,
     totalStaff: 0,
+    lowStockProducts: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -41,6 +51,7 @@ const Dashboard = () => {
         totalServices: 0,
         totalProducts: 0,
         totalStaff: 0,
+        lowStockProducts: [],
       });
     } finally {
       setLoading(false);
@@ -121,6 +132,24 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {stats.lowStockProducts && stats.lowStockProducts.length > 0 && (
+        <Alert variant="destructive" className="border-red-500 bg-red-50">
+          <AlertTriangle className="h-5 w-5" />
+          <AlertTitle className="font-semibold">Low Stock Alert!</AlertTitle>
+          <AlertDescription>
+            <p className="mb-2">The following products are running low on stock:</p>
+            <ul className="list-disc list-inside space-y-1">
+              {stats.lowStockProducts.map((product) => (
+                <li key={product.id}>
+                  <strong>{product.name}</strong> - {product.currentStockQuantity} {product.productWeightUnit} remaining
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-sm">Please reorder these products soon to avoid stockouts.</p>
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };
